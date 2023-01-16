@@ -33,10 +33,10 @@ library(MuMIn)
 ##
 
 # Load vegetation data:
-veg_data<-read.table("processed_data/veg_data_forestreplot.csv")
+veg_data<-read.table("data/veg_data_forestreplot.csv")
 
 # Load plot data:
-plot_data<-read.table("processed_data/plot_data_forestreplot.csv")
+plot_data<-read.table("data/plot_data_forestreplot.csv")
 
 # Calculate temporal rates:
 plot_data$herb_dif_pd_rr<-plot_data$herb_dif_pd/plot_data$time_resurvey
@@ -209,8 +209,8 @@ res<-do.call(cbind, res)
 r2s<-round(do.call(rbind, r2s), 2)
 
 # Save results:
-write.table(res, "processed_data/models_lme.csv")
-write.table(r2s, "processed_data/r2s_lme.csv")
+write.table(res, "data/models_lme.csv")
+write.table(r2s, "data/r2s_lme.csv")
 
 # Clean-up environment:
 rm(list = ls())

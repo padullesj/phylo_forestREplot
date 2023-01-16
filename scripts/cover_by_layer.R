@@ -7,7 +7,7 @@
 library(stringi)
 
 # Load vegetation data:
-veg_data<-read.table("processed_data/veg_data_forestreplot.csv")
+veg_data<-read.table("data/veg_data_forestreplot.csv")
 
 # Subset layer of interest (T=tree, S=shrub; H=herb):
 veg_data_tree<- unique(subset(veg_data, layer == "T"))
@@ -47,7 +47,7 @@ for (i in 1:length(pairs)){
 }
 
 # Save result:
-write.table(lcv, "processed_data/tree_covers.csv")
+write.table(lcv, "data/tree_covers.csv")
 
 # Clean-up environment:
 rm(list = ls())

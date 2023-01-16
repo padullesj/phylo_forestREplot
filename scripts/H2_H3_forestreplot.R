@@ -46,7 +46,7 @@ library(caper)
 ##
 
 # Load plot data:
-plot_data<-read.table("processed_data/plot_data_forestreplot.csv")
+plot_data<-read.table("data/plot_data_forestreplot.csv")
 
 #Subset plots with resurvey time >= 20 years for H1, H2 & H3:
 plot_data2<-subset(plot_data, time_resurvey>=20)
@@ -56,7 +56,7 @@ plot_data2<-subset(plot_data2, year_final>2000)
 plot_data2<-plot_data2[order(row.names(plot_data2)), ]
 
 # Load vegetation data:
-veg_data<-read.table("processed_data/veg_data_forestreplot.csv")
+veg_data<-read.table("data/veg_data_forestreplot.csv")
 
 # Retain plots from the new "plot_data":
 veg_data<-veg_data[veg_data$plotID %in% unique(plot_data2$plotID), ]
@@ -190,7 +190,7 @@ for (i in 1:length(spp)){
 }
 
 # Save result:
-write.table(out, "processed_data/species_U_values.csv")
+write.table(out, "data/species_U_values.csv")
 
 
 ##
@@ -198,10 +198,10 @@ write.table(out, "processed_data/species_U_values.csv")
 ##
 
 # Load U values:
-out<-read.table("processed_data/species_U_values.csv")
+out<-read.table("data/species_U_values.csv")
 
 # Assign families to species and add to table with the U values:
-fam<-read.table("processed_data/veg_data_forestreplot.csv")
+fam<-read.table("data/veg_data_forestreplot.csv")
 fam<-unique(subset(fam, select = c(scientificName, family))) #simplify table
 names(fam)[1]<-"species"
 out2<-merge(out, fam, by="species", all.x=T)
@@ -213,7 +213,7 @@ rownames(out)<-out$species #assign row names
 out$species<-NULL #delete unnecessary field
 
 # Load tree:
-tree<-read.tree("processed_data/phylo.tree.tre")
+tree<-read.tree("data/phylo.tree.tre")
 treef<-keep.tip(tree, rownames(out)) #subset species present in the U values list
 
 
@@ -233,8 +233,8 @@ phylosig(treef, out2, method="lambda", test=TRUE, nsim=999)
 # Run the node.mean function (load from "node.mean_function_forestreplot)
 # to detect nodes with higher or lower tendencies than under random expectation:
 nodef<-node.mean(treef, out, 999) #this can take a while
-#write.table(nodef, "processed_data/node_forestreplot.csv") #save the result
-#nodef<-read.table("processed_data/node_forestreplot.csv") #load the result
+#write.table(nodef, "data/node_forestreplot.csv") #save the result
+#nodef<-read.table("data/node_forestreplot.csv") #load the result
 
 # Clean-up result to highlight nodes in the tree:
 significant<-nodef #create a copy of the main result
@@ -253,7 +253,7 @@ significant<-factor(significant, levels = c("neg.05", "pos.05" )) #change order 
 ###
 
 # Get list of taxa by family:
-fam<-read.table("processed_data/veg_data_forestreplot.csv")
+fam<-read.table("data/veg_data_forestreplot.csv")
 fam<-unique(subset(fam, select = c(scientificName, family))) #simplify table
 fam$scientificName<-gsub(" ", "_", fam$scientificName) #adapt species nomenclature
 fam<-fam[which(fam$scientificName %in% rownames(out)),] #subset species included in wl
@@ -390,17 +390,17 @@ p1 <- gheatmap(p, out, offset=0.3, width=.03, colnames = F, color = NULL) +
 ##
 
 # Load U values:
-out<-read.table("processed_data/species_U_values.csv")
+out<-read.table("data/species_U_values.csv")
 out$species<-gsub(" ", "_", out$species) #change names of species
 out<-out[!is.na(out$uvalue),] #remove NA
 
 # Load trait data:
-spp_traits<-read.table("processed_data/traits_forestreplot.csv")
+spp_traits<-read.table("data/traits_forestreplot.csv")
 spp_traits$species<-gsub(" ", "_", spp_traits$species) #create column with species names
 rownames(spp_traits)<-spp_traits$species #assign species as row names
 
 # Load tree:
-tree<-read.tree("processed_data/phylo.tree.tre")
+tree<-read.tree("data/phylo.tree.tre")
 
 
 ##

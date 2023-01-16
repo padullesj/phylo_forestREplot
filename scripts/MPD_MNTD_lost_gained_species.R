@@ -10,10 +10,10 @@ library(picante)
 library(PhyloMeasures)
 
 # Load tree
-tree<-read.tree("processed_data/phylo.tree.tre")
+tree<-read.tree("data/phylo.tree.tre")
 
 # Load vegetation data:
-veg_data<-read.table("processed_data/veg_data_forestreplot.csv")
+veg_data<-read.table("data/veg_data_forestreplot.csv")
 
 # Subset understory layer:
 veg_data_und<- unique(subset(veg_data, layer == "H"))
@@ -103,7 +103,7 @@ for (i in 1:length(plots)){
 }
 
 # Save result:
-write.table(out, "processed_data/plot_data_MPD_MNTD_metrics.csv")
+write.table(out, "data/plot_data_MPD_MNTD_metrics.csv")
 
 # Clean-up environment:
 rm(list = ls())

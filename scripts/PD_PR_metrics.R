@@ -13,7 +13,7 @@ library(ape)
 tree<-read.tree("data/phylo.tree.tre")
 
 # Load plot data:
-plot_time<-read.table("data/plot_data_time.csv")
+plot_time<-read.table("data/plot_data_forestreplot.csv")
 
 # Load vegetation data:
 veg_data<-read.table("data/veg_data_forestreplot.csv")
@@ -70,9 +70,9 @@ for (i in 1:length(plots)){
 
   # Prepare table to get diversity values:
   veg_com <- subset(sub_veg, angiosperm="angiosperm") #subset angiosperms
-  veg_com <- unique(subset(veg_com, select = c(sample, scientificName))) #subset columns
+  veg_com <- unique(subset(veg_com, select = c(sample, species_id))) #subset columns
   veg_com$value<-1 #add  column with 1 as value
-  veg_com<-reshape2::dcast(veg_com, sample ~ scientificName, value.var="value") #get long-format table
+  veg_com<-reshape2::dcast(veg_com, sample ~ species_id, value.var="value") #get long-format table
   rownames(veg_com)<-veg_com$sample #assign plot names to row names
   veg_com$sample<-NULL #remove column with plot names
   veg_com <- veg_com  %>% mutate_all(funs(replace_na(.,0))) #replace NA with 0

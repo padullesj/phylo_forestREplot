@@ -82,7 +82,7 @@ for (i in 1:length(plots)){
   out<-rbind(out, sub_veg) #merge results
 }
 veg_data2<-out #create a copy
-veg_data2 <- unique(subset(veg_data2, select = c(scientificName, sample, plotID))) #simplify table
+veg_data2 <- unique(subset(veg_data2, select = c(species_id, sample, plotID))) #simplify table
 veg_data2$study<-substr(veg_data2$plotID, 1, 3) #add field
 
 ##
@@ -94,7 +94,7 @@ veg_data2$study<-substr(veg_data2$plotID, 1, 3) #add field
 ##
 
 # Get list of species:
-spp <-sort(unique(veg_data2$scientificName)) #subset species occurring in at least 10 plots and 3 sites
+spp <-sort(unique(veg_data2$species_id)) #subset species occurring in at least 10 plots and 3 sites
 
 # Get final list of plots:
 plots<-unique(veg_data2$plotID)
@@ -105,7 +105,7 @@ out<-data.frame(species=spp, uvalue=rep(NA, length(spp)))
 # Loop to calculate U values per species:
 for (i in 1:length(spp)){ 
   print(i/length(spp)) #print progress
-  sub_veg<-unique(subset(veg_data2, scientificName==spp[i])) #subset species
+  sub_veg<-unique(subset(veg_data2, species_id==spp[i])) #subset species
 
   # Get plot names:
   plots<-unique(sub_veg$plotID) #get unique list of plots where the species occurs
@@ -146,8 +146,7 @@ write.table(out, "data/species_U_values.csv")
 out<-read.table("data/species_U_values.csv")
 
 # Assign families to species and add to table with the U values:
-fam<-read.table("data/veg_data_forestreplot.csv")
-fam<-unique(subset(fam, select = c(scientificName, family))) #simplify table
+fam<-read.table("data/species_families.csv")
 names(fam)[1]<-"species"
 out2<-merge(out, fam, by="species", all.x=T)
 
@@ -199,9 +198,9 @@ significant<-factor(significant, levels = c("neg.05", "pos.05" )) #change order 
 
 # Get list of taxa by family:
 fam<-read.table("data/veg_data_forestreplot.csv")
-fam<-unique(subset(fam, select = c(scientificName, family))) #simplify table
-fam$scientificName<-gsub(" ", "_", fam$scientificName) #adapt species nomenclature
-fam<-fam[which(fam$scientificName %in% rownames(out)),] #subset species included in wl
+fam<-unique(subset(fam, select = c(species_id, family))) #simplify table
+fam$species_id<-gsub(" ", "_", fam$species_id) #adapt species nomenclature
+fam<-fam[which(fam$species_id %in% rownames(out)),] #subset species included in wl
 
 # Get table with ranked families based on their number of species:
 famf<-as.data.frame(table(fam$family)) #create dataframe
@@ -215,7 +214,7 @@ list.r <- unique(fam$family)
 list.nod<-NULL #create empty object to store the results
 for (i in 1:length(list.r)) {
   #print(i)
-  tips3 <- as.vector(subset(fam, family == list.r[i])$scientificName) #vector with all species belonging to the given family
+  tips3 <- as.vector(subset(fam, family == list.r[i])$species_id) #vector with all species belonging to the given family
   if (length(tips3)>1) {
     num <- phytools::findMRCA(treef, tips3) #get node that contain those species
     num <-data.frame(list.r[i], num) #assign family name to node
@@ -346,7 +345,7 @@ out<-out[!is.na(out$uvalue),] #remove NA
 
 # Load trait data:
 spp_traits<-read.table("data/traits_forestreplot.csv")
-spp_traits$species<-gsub(" ", "_", spp_traits$species) #create column with species names
+names(spp_traits)[11]<-"species"
 rownames(spp_traits)<-spp_traits$species #assign species as row names
 
 # Load tree:

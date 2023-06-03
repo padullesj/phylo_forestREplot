@@ -39,9 +39,9 @@ for (i in 1:length(plots)){
   sub_veg<-veg_data_und[veg_data_und$sample %in% sub_veg, ] #subset plots from veg_data
   
   # Prepare table to get diversity values:
-  veg_com <- unique(subset(sub_veg, select = c(sample, scientificName))) #subset columns
+  veg_com <- unique(subset(sub_veg, select = c(sample, species_id))) #subset columns
   veg_com$value<-1 #add  column with 1 as value
-  veg_com<-reshape2::dcast(veg_com, sample ~ scientificName, value.var="value") #get long-format table
+  veg_com<-reshape2::dcast(veg_com, sample ~ species_id, value.var="value") #get long-format table
   rownames(veg_com)<-veg_com$sample #assign plot names to rownames
   veg_com$sample<-NULL #remove column with plot names
   veg_com <- veg_com  %>% mutate_all(funs(replace_na(.,0))) #replace NA with 0

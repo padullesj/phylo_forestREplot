@@ -8,7 +8,7 @@ library(stringi)
 
 # Load vegetation data:
 veg_data<-read.table("data/veg_data_forestreplot.csv")
-View(veg_data)
+
 # Subset layer of interest (T=tree, S=shrub; H=herb):
 veg_data_tree<- unique(subset(veg_data, layer == "T"))
 

@@ -36,7 +36,7 @@ library(MuMIn)
 plot_data<-read.table("data/plot_data_forestreplot.csv")
 
 # Add "study" to vegetation data:
-plot_data$study<-substr(plot_data$plotID, 1, 3) #add field
+plot_data$study<-substr(plot_data$plotID, 1, 6) #add field
 
 # Calculate rates of change of environmental variables:
 plot_data$rate_dif_tmx_avg<-(plot_data$dif_tmx_avg/plot_data$time_resurvey)

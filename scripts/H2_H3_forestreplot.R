@@ -52,7 +52,6 @@ out<-read.table("data/species_U_values.csv")
 
 # Assign families to species and add to table with the U values:
 fam<-read.table("data/species_families.csv")
-names(fam)[1]<-"species"
 out2<-merge(out, fam, by="species", all.x=T)
 
 # Reshape table:
@@ -103,7 +102,6 @@ significant<-factor(significant, levels = c("neg.05", "pos.05" )) #change order 
 
 # Get list of taxa by family:
 fam<-read.table("data/species_families.csv")
-names(fam)[1]<-"species"
 fam$species<-gsub(" ", "_", fam$species) #adapt species nomenclature
 fam<-fam[which(fam$species %in% rownames(out)),] #subset species included in out
 

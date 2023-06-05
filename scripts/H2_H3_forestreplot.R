@@ -7,21 +7,19 @@
 #
 # Table of contents
 #
-# A: Load plot and vegetation data
 #
-# B: H2
-# B.1: Calculate U values
-# B.2: Load phylogenetic tree and U values
-# B.3: Calculate phylogenetic signal
-# B.4: Get nodes with higher or lower mean U values
-# B.5: Plot phylogenetic tree
+# A: H2
+# A.2: Load phylogenetic tree and U values
+# A.3: Calculate phylogenetic signal
+# A.4: Get nodes with higher or lower mean U values
+# A.5: Plot phylogenetic tree
 #
-# C: H3
-# C.1: Load U values, trait data, and phylogenetic tree
-# C.2: Integrate data
-# C.3: Run PGLS
+# B: H3
+# B.1: Load U values, trait data, and phylogenetic tree
+# B.2: Integrate data
+# B.3: Run PGLS
 #
-# D: Create final figure
+# C: Create final figure
 #
 #####################
 
@@ -42,104 +40,11 @@ library(phytools)
 library(caper)
 
 ##
-# A: Load plot and vegetation data
-##
-
-# Load plot data:
-plot_data<-read.table("data/plot_data_forestreplot.csv")
-
-#Subset plots with resurvey time >= 20 years for H1, H2 & H3:
-plot_data2<-subset(plot_data, time_resurvey>=20)
-
-#Subset plots re-surveyed after 2000 for H1, H2 & H3:
-plot_data2<-subset(plot_data2, year_final>2000)
-plot_data2<-plot_data2[order(row.names(plot_data2)), ]
-
-# Subset rows with non NA:
-plot_data2<-subset(plot_data2, !is.infinite(plot_data2$herb_delta_pd_obs))
-plot_data2<-subset(plot_data2, !is.na(plot_data2$herb_delta_pd_obs))
-
-# Load vegetation data:
-veg_data<-read.table("data/veg_data_forestreplot.csv")
-
-# Retain plots from the new "plot_data":
-veg_data<-veg_data[veg_data$plotID %in% unique(plot_data2$plotID), ]
-
-# Subset the understory layer:
-veg_data<- unique(subset(veg_data, layer == "H"))
-
-# Get unique list of plots:
-plots<-unique(veg_data$plotID)
-
-# Keep plots from baseline and last year
-out<-NULL #create empty object to store results
-for (i in 1:length(plots)){ 
-  print(i/length(plots)) #print progress
-  sub_veg<-sort(unique((subset(veg_data, plotID==plots[i]))$sample)) #filter plot
-  sub_veg<-c(head(sub_veg, 1), tail(sub_veg, 1)) #select the baseline and final plots
-  
-  sub_veg<-veg_data[veg_data$sample %in% sub_veg, ] #subset plots from veg_data
-  out<-rbind(out, sub_veg) #merge results
-}
-veg_data2<-out #create a copy
-veg_data2 <- unique(subset(veg_data2, select = c(species_id, sample, plotID))) #simplify table
-veg_data2$study<-substr(veg_data2$plotID, 1, 3) #add field
-
-##
-# B: H2
+# A: H2
 ##
 
 ##
-# B.1: Calculate U values
-##
-
-# Get list of species:
-spp <-sort(unique(veg_data2$species_id)) #subset species occurring in at least 10 plots and 3 sites
-
-# Get final list of plots:
-plots<-unique(veg_data2$plotID)
-
-# Prepare output table:
-out<-data.frame(species=spp, uvalue=rep(NA, length(spp)))
-
-# Loop to calculate U values per species:
-for (i in 1:length(spp)){ 
-  print(i/length(spp)) #print progress
-  sub_veg<-unique(subset(veg_data2, species_id==spp[i])) #subset species
-
-  # Get plot names:
-  plots<-unique(sub_veg$plotID) #get unique list of plots where the species occurs
-  
-  # Determine if a species was gained (1), lost (-1), or remained present (0) over time
-  out2<-NULL #create empty object
-  for (j in 1:length(plots)){
-    sub_veg2<-subset(sub_veg, plotID==plots[j])
-
-    if(nrow(sub_veg2) == 2) {
-      a<-0
-    } else {
-      if(endsWith(sub_veg2$sample, 'B')) {
-        a<--1
-      } else {
-        a<-1
-      }
-    }
-    out2<-c(out2, a)
-  }
-  
-  # Merge result with climatic data:
-  res<-data.frame(plotID=plots, change=out2)
-  res$study<-substr(res$plotID, 1, 3)
-  
-  out$uvalue[i]<-mean(res$change)
-}
-
-# Save result:
-write.table(out, "data/species_U_values.csv")
-
-
-##
-# B.2: Load phylogenetic tree and U values
+# A.1: Load phylogenetic tree and species U values
 ##
 
 # Load U values:
@@ -162,7 +67,7 @@ treef<-keep.tip(tree, rownames(out)) #subset species present in the U values lis
 
 
 ##
-# B.3: Calculate phylogenetic signal
+# A.2: Calculate phylogenetic signal
 ##
 
 out2<-as.numeric(out$uvalue)
@@ -171,7 +76,7 @@ phylosig(treef, out2, method="lambda", test=TRUE, nsim=999)
 
 
 ##
-# B.4: Get nodes with higher or lower mean U values
+# A.3: Get nodes with higher or lower mean U values
 ##
 
 # Run the node.mean function (load from "node.mean_function_forestreplot)
@@ -193,14 +98,14 @@ significant<-factor(significant, levels = c("neg.05", "pos.05" )) #change order 
 
 
 ###
-# B.5: Plot phylogenetic tree
+# A.4: Plot phylogenetic tree
 ###
 
 # Get list of taxa by family:
-fam<-read.table("data/veg_data_forestreplot.csv")
-fam<-unique(subset(fam, select = c(species_id, family))) #simplify table
-fam$species_id<-gsub(" ", "_", fam$species_id) #adapt species nomenclature
-fam<-fam[which(fam$species_id %in% rownames(out)),] #subset species included in wl
+fam<-read.table("data/species_families.csv")
+names(fam)[1]<-"species"
+fam$species<-gsub(" ", "_", fam$species) #adapt species nomenclature
+fam<-fam[which(fam$species %in% rownames(out)),] #subset species included in out
 
 # Get table with ranked families based on their number of species:
 famf<-as.data.frame(table(fam$family)) #create dataframe
@@ -214,7 +119,7 @@ list.r <- unique(fam$family)
 list.nod<-NULL #create empty object to store the results
 for (i in 1:length(list.r)) {
   #print(i)
-  tips3 <- as.vector(subset(fam, family == list.r[i])$species_id) #vector with all species belonging to the given family
+  tips3 <- as.vector(subset(fam, family == list.r[i])$species) #vector with all species belonging to the given family
   if (length(tips3)>1) {
     num <- phytools::findMRCA(treef, tips3) #get node that contain those species
     num <-data.frame(list.r[i], num) #assign family name to node
@@ -331,11 +236,11 @@ p1 <- gheatmap(p, out, offset=0.3, width=.03, colnames = F, color = NULL) +
 
 
 ##
-# C: H3
+# B: H3
 ##
 
 ##
-# C.1: Load U values, trait data, and phylogenetic tree
+# B.1: Load U values, trait data, and phylogenetic tree
 ##
 
 # Load U values:
@@ -346,6 +251,7 @@ out<-out[!is.na(out$uvalue),] #remove NA
 # Load trait data:
 spp_traits<-read.table("data/traits_forestreplot.csv")
 names(spp_traits)[11]<-"species"
+spp_traits$species<-gsub(" ", "_", spp_traits$species) #change names of species
 rownames(spp_traits)<-spp_traits$species #assign species as row names
 
 # Load tree:
@@ -353,7 +259,7 @@ tree<-read.tree("data/phylo.tree.tre")
 
 
 ##
-# C.2: Integrate data
+# B.2: Integrate data
 ##
 
 # Merge traits and U values:
@@ -366,7 +272,7 @@ treef$node.label<-NULL
 
 
 ##
-# C.3: Run PGLS
+# B.3: Run PGLS
 ##
 
 # Merge spp_traits with phylogenetic tree:
@@ -413,7 +319,7 @@ p_rat<-ggplot(rat, aes(x=var, y=Estimate, ymin=low, ymax=up, shape=col)) +
 
 
 ##
-# D: Create final figure
+# C: Create final figure
 ##
 
 # Create layout to print:

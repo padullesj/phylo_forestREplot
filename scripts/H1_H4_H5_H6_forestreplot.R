@@ -32,9 +32,6 @@ library(MuMIn)
 # A: Load and clean-up data
 ##
 
-# Load vegetation data:
-veg_data<-read.table("data/veg_data_forestreplot.csv")
-
 # Load plot data:
 plot_data<-read.table("data/plot_data_forestreplot.csv")
 

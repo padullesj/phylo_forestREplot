@@ -250,7 +250,6 @@ out<-out[!is.na(out$uvalue),] #remove NA
 
 # Load trait data:
 spp_traits<-read.table("data/traits_forestreplot.csv")
-names(spp_traits)[11]<-"species"
 spp_traits$species<-gsub(" ", "_", spp_traits$species) #change names of species
 rownames(spp_traits)<-spp_traits$species #assign species as row names
 

@@ -142,6 +142,7 @@ treef <- full_join(treef, d, by = 'node')
 # Get values per family
 names(nodef)[1]<-"num"
 famv<-merge(famf, nodef, by="num", all.x=T)
+famv$Freq<-NULL
 write.table(famv, "data/families_values_all.csv")
 
 # Get vector with names of families containing more species:
